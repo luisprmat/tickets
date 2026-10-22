@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import TheWelcome from '../components/TheWelcome.vue'
+//
 </script>
 
 <template>
   <main>
-    <TheWelcome />
+    <div class="mt-1 text-3xl text-blue-500">Tickets App</div>
   </main>
 </template>
