@@ -10,6 +10,11 @@ import {
 } from '@/components/ui/breadcrumb'
 import { Separator } from '@/components/ui/separator'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
+import { computed } from 'vue'
+import { RouterView, useRoute } from 'vue-router'
+
+const route = useRoute()
+const pageTitle = computed(() => route.meta.title ?? '')
 </script>
 
 <template>
@@ -25,17 +30,21 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/s
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem class="hidden md:block">
-                <BreadcrumbLink href="#"> Building Your Application </BreadcrumbLink>
+                <BreadcrumbLink as-child>
+                  <RouterLink to="/">Tickets</RouterLink>
+                </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator class="hidden md:block" />
               <BreadcrumbItem>
-                <BreadcrumbPage>Data Fetching</BreadcrumbPage>
+                <BreadcrumbPage>{{ pageTitle }}</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </div>
       </header>
-      <div class="flex flex-1 flex-col gap-4 p-4 pt-0">Router</div>
+      <div class="flex flex-1 flex-col gap-4 p-4 pt-0">
+        <RouterView />
+      </div>
     </SidebarInset>
   </SidebarProvider>
 </template>

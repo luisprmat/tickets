@@ -21,7 +21,7 @@ defineProps<{
 
 <template>
   <SidebarGroup>
-    <SidebarGroupLabel>Menú principal</SidebarGroupLabel>
+    <SidebarGroupLabel>Main menu</SidebarGroupLabel>
     <SidebarMenu>
       <SidebarMenuItem v-for="item in items" :key="item.title">
         <SidebarMenuButton as-child :tooltip="item.title">

@@ -14,15 +14,13 @@ import {
   SidebarRail,
 } from '@/components/ui/sidebar'
 
+import { useAuthStore } from '@/stores/auth'
 import { RouterLink } from 'vue-router'
+
+const auth = useAuthStore()
 
 // This is sample data.
 const data = {
-  user: {
-    name: 'shadcn',
-    email: 'm@example.com',
-    avatar: '/avatars/shadcn.jpg',
-  },
   navMain: [
     {
       title: 'Home',
@@ -53,7 +51,7 @@ const data = {
       <NavMain :items="data.navMain" />
     </SidebarContent>
     <SidebarFooter>
-      <NavUser :user="data.user" />
+      <NavUser v-if="auth.user" :user="auth.user" />
     </SidebarFooter>
     <SidebarRail />
   </Sidebar>

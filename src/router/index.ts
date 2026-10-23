@@ -1,4 +1,6 @@
-import List from '@/pages/tickets/List.vue'
+import AppLayout from '@/layouts/AppLayout.vue'
+import AuthLayout from '@/layouts/AuthLayout.vue'
+import { useAuthStore } from '@/stores/auth'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
@@ -6,18 +8,52 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: List,
+      component: AppLayout,
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: '',
+          name: 'home',
+          component: () => import('@/pages/tickets/List.vue'),
+          meta: { title: 'List' },
+        },
+        {
+          path: 'about',
+          name: 'about',
+          component: () => import('@/pages/About.vue'),
+          meta: { title: 'About' },
+        },
+      ],
     },
     {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../pages/About.vue'),
+      path: '/',
+      component: AuthLayout,
+      meta: { guestOnly: true },
+      children: [
+        {
+          path: 'login',
+          name: 'login',
+          component: () => import('@/pages/auth/Login.vue'),
+        },
+      ],
     },
   ],
+})
+
+router.beforeEach(async (to) => {
+  const auth = useAuthStore()
+
+  // Load the authenticated user once per session (e.g. after a page reload)
+  if (auth.isAuthenticated && !auth.user) {
+    await auth.getUser()
+  }
+
+  if (to.matched.some((r) => r.meta.requiresAuth) && !auth.isAuthenticated) {
+    return { name: 'login', query: { redirect: to.fullPath } }
+  }
+  if (to.matched.some((r) => r.meta.guestOnly) && auth.isAuthenticated) {
+    return { name: 'home' }
+  }
 })
 
 export default router

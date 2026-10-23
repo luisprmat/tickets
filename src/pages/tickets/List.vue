@@ -37,7 +37,7 @@ const goToPage = (page: number) => {
 const pageLinks = computed(() => tickets.value?.meta.links.slice(1, -1) ?? [])
 </script>
 <template>
-  <div>Tabla de Tickets</div>
+  <div>Tickets Table</div>
   <Table>
     <TableHeader>
       <TableRow>
