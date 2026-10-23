@@ -5,8 +5,8 @@ import type { PaginatedTickets } from '@/types'
 export const useTickets = () => {
   const tickets = ref<PaginatedTickets | null>(null)
 
-  const getTickets = async () => {
-    const { data } = await useApi('/tickets').get().json<PaginatedTickets>()
+  const getTickets = async (page = 1) => {
+    const { data } = await useApi(`/tickets?page=${page}`).get().json<PaginatedTickets>()
     tickets.value = data.value
   }
 
