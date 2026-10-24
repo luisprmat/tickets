@@ -17,7 +17,17 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination'
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+
+import { Separator } from '@/components/ui/separator'
 import { useTickets } from '@/composables/useTickets'
+import type { TicketStatus } from '@/types'
 import { computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -25,19 +35,63 @@ const route = useRoute()
 const router = useRouter()
 const { getTickets, tickets } = useTickets()
 
-// The URL (?page=N) is the source of truth: every change refetches the tickets
+const statusOptions: { value: TicketStatus; label: string }[] = [
+  { value: 'open', label: 'Open' },
+  { value: 'in_progress', label: 'In progress' },
+  { value: 'resolved', label: 'Resolved' },
+  { value: 'closed', label: 'Closed' },
+]
+
+// SelectItem can't use an empty value, so "all" stands for "no filter"
+const ALL_STATUSES = 'all'
+
+// The URL (?page=N&status=X) is the source of truth: every change refetches the tickets
 const currentPage = computed(() => Number(route.query.page) || 1)
-watch(currentPage, (page) => getTickets(page), { immediate: true })
+const currentStatus = computed(
+  () => statusOptions.find((option) => option.value === route.query.status)?.value,
+)
+watch([currentPage, currentStatus], ([page, status]) => getTickets(page, status), {
+  immediate: true,
+})
 
 const goToPage = (page: number) => {
   router.push({ query: { ...route.query, page: page > 1 ? page : undefined } })
 }
 
+// Reads from and writes to the URL, so v-model doesn't duplicate the state
+const selectedStatus = computed({
+  get: () => currentStatus.value ?? ALL_STATUSES,
+  // A new filter changes the result set, so go back to the first page
+  set: (status) => {
+    router.push({
+      query: {
+        ...route.query,
+        page: undefined,
+        status: status !== ALL_STATUSES ? status : undefined,
+      },
+    })
+  },
+})
+
 // meta.links wraps the pages with "« Previous" and "Next »"; keep only page numbers and ellipses
 const pageLinks = computed(() => tickets.value?.meta.links.slice(1, -1) ?? [])
 </script>
 <template>
-  <div>Tickets Table</div>
+  <div class="font-semibold text-xl">Tickets Table</div>
+  <Separator />
+  <form>
+    <Select v-model="selectedStatus">
+      <SelectTrigger>
+        <SelectValue placeholder="Filter by status" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem :value="ALL_STATUSES">All statuses</SelectItem>
+        <SelectItem v-for="option in statusOptions" :key="option.value" :value="option.value">
+          {{ option.label }}
+        </SelectItem>
+      </SelectContent>
+    </Select>
+  </form>
   <Table>
     <TableHeader>
       <TableRow>
