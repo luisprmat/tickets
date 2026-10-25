@@ -25,9 +25,11 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
+import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { useTickets } from '@/composables/useTickets'
 import type { TicketStatus } from '@/types'
+import { PencilIcon } from '@lucide/vue'
 import { computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -106,7 +108,13 @@ const pageLinks = computed(() => tickets.value?.meta.links.slice(1, -1) ?? [])
         <TableCell class="font-medium">{{ ticket.id }}</TableCell>
         <TableCell>{{ ticket.subject }}</TableCell>
         <TableCell>{{ ticket.status }}</TableCell>
-        <TableCell class="text-right"></TableCell>
+        <TableCell class="text-right">
+          <Button variant="secondary" size="icon" as-child>
+            <RouterLink :to="{ name: 'edit', params: { id: ticket.id } }">
+              <PencilIcon />
+            </RouterLink>
+          </Button>
+        </TableCell>
       </TableRow>
     </TableBody>
   </Table>

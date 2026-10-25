@@ -23,6 +23,12 @@ const router = createRouter({
           component: () => import('@/pages/About.vue'),
           meta: { title: 'About' },
         },
+        {
+          path: ':id/edit',
+          name: 'edit',
+          component: () => import('@/pages/tickets/Edit.vue'),
+          meta: { title: 'Edit' },
+        },
       ],
     },
     {

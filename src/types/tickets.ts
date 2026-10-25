@@ -12,3 +12,9 @@ export type Ticket = {
 }
 
 export type PaginatedTickets = Paginated<Ticket>
+
+export type TicketResponse = {
+  data: Ticket
+}
+
+export type TicketPayload = Pick<Ticket, 'subject' | 'description'>
