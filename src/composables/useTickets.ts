@@ -1,6 +1,7 @@
 import { useApi } from '@/composables/useApi'
 import { ValidationError } from '@/stores/auth'
 import type {
+  ErrorResponse,
   PaginatedTickets,
   Ticket,
   TicketPayload,
@@ -55,11 +56,29 @@ export const useTickets = () => {
     return ticket.value
   }
 
+  const deleteTicket = async (id: number | string) => {
+    const { data, response, statusCode } = await useApi(`/tickets/${id}`)
+      .delete()
+      .json<ErrorResponse>()
+
+    // Rely on the HTTP status, not on `error`: the API answers with 204 No Content, and
+    // parsing that empty body as JSON fails and sets `error` even though the delete succeeded
+    if (!response.value?.ok) {
+      if (statusCode.value === 403 && data.value?.message) {
+        throw new Error(data.value.message)
+      }
+      throw new Error('Could not delete the ticket, please try again')
+    }
+
+    ticket.value = null
+  }
+
   return {
     ticket,
     tickets,
     getTicket,
     getTickets,
     updateTicket,
+    deleteTicket,
   }
 }

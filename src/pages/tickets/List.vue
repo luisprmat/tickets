@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
+import DeleteTicket from '@/components/tickets/DeleteTicket.vue'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { useTickets } from '@/composables/useTickets'
@@ -75,6 +76,13 @@ const selectedStatus = computed({
   },
 })
 
+// After a deletion go back to '/' (first page, no filter). If we are already there the
+// navigation is a no-op that returns a failure, so refetch explicitly
+const onTicketDeleted = async () => {
+  const failure = await router.push('/')
+  if (failure) await getTickets()
+}
+
 // meta.links wraps the pages with "« Previous" and "Next »"; keep only page numbers and ellipses
 const pageLinks = computed(() => tickets.value?.meta.links.slice(1, -1) ?? [])
 </script>
@@ -108,12 +116,13 @@ const pageLinks = computed(() => tickets.value?.meta.links.slice(1, -1) ?? [])
         <TableCell class="font-medium">{{ ticket.id }}</TableCell>
         <TableCell>{{ ticket.subject }}</TableCell>
         <TableCell>{{ ticket.status }}</TableCell>
-        <TableCell class="text-right">
+        <TableCell class="flex justify-end gap-2">
           <Button variant="secondary" size="icon" as-child>
             <RouterLink :to="{ name: 'edit', params: { id: ticket.id } }">
               <PencilIcon />
             </RouterLink>
           </Button>
+          <DeleteTicket :ticket="ticket" @deleted="onTicketDeleted" />
         </TableCell>
       </TableRow>
     </TableBody>
